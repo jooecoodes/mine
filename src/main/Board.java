@@ -9,31 +9,45 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+// COVERED _MINE_CELL =  MINE_CELL + COVER_FOR_CELL
+// MARKED_MINE_CELL = COVERED_MINE_CELL + MARK_FOR_CELL
+// BOARD_WIDTH = N_COLS * CELL_SIZE + 1
+// BOARD_HEIGHT = N_ROWS * CELL_SIZE + 1
+
+enum Settings{
+	NUM_IMAGES(13),
+	CELL_SIZE(15),
+	COVER_FOR_CELL(10),
+	MARK_FOR_CELL(10),
+	EMPTY_CELL(0),
+	MINE_CELL(9),
+	COVERED_MINE_CELL(19),
+	MARKED_MINE_CELL(29),
+	DRAW_MINE(9),
+	DRAW_COVER(10),
+	DRAW_MARK(11),
+	DRAW_WRONG_MARK(12),
+	N_MINES(40),
+	N_ROWS(16),
+	N_COLS(16),
+	BOARD_WIDTH(241),
+	BOARD_HEIGHT(241);
+	
+
+    private int value;
+	
+    // Constructor to set the value
+    Settings(int value) {
+        this.value = value;
+    }
+
+    // Getter to retrieve the value
+    public int getValue() {
+        return this.value;
+    }
+}
+
 public class Board extends JPanel {
-
-    private final int NUM_IMAGES = 13;
-    private final int CELL_SIZE = 15;
-
-    private final int COVER_FOR_CELL = 10;
-    private final int MARK_FOR_CELL = 10;
-    private final int EMPTY_CELL = 0;
-    private final int MINE_CELL = 9;
-    
-    private final int COVERED_MINE_CELL = MINE_CELL + COVER_FOR_CELL;
-    private final int MARKED_MINE_CELL = COVERED_MINE_CELL + MARK_FOR_CELL;
-    
-    private final int DRAW_MINE = 9;
-    private final int DRAW_COVER = 10;
-    private final int DRAW_MARK = 11;
-    private final int DRAW_WRONG_MARK = 12;
-
-    private final int N_MINES = 40;
-    private final int N_ROWS = 16;
-    private final int N_COLS = 16;
-
-    private final int BOARD_WIDTH = N_COLS * CELL_SIZE + 1;
-    private final int BOARD_HEIGHT = N_ROWS * CELL_SIZE + 1;
-
     
  
     private int[] field;
@@ -45,18 +59,18 @@ public class Board extends JPanel {
     private final JLabel statusbar;
 
     public Board(JLabel statusbar) {
-
+    	System.out.println(Settings.NUM_IMAGES.getValue());
         this.statusbar = statusbar;
         initBoard();
     }
 
     private void initBoard() {
 
-        setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
+        setPreferredSize(new Dimension(Settings.BOARD_WIDTH.getValue(), Settings.BOARD_HEIGHT.getValue()));
 
-        img = new Image[NUM_IMAGES];
+        img = new Image[Settings.NUM_IMAGES.getValue()];
 
-        for (int i = 0; i < NUM_IMAGES; i++) {
+        for (int i = 0; i < Settings.NUM_IMAGES.getValue(); i++) {
 
             var path = "src/resources/" + i + ".png";
             img[i] = (new ImageIcon(path)).getImage();
@@ -71,42 +85,42 @@ public class Board extends JPanel {
         int cell;
         var random = new Random();
         inGame = true;
-        minesLeft = N_MINES;
-        allCells = N_ROWS * N_COLS;
+        minesLeft = Settings.N_MINES.getValue();
+        allCells = Settings.N_ROWS.getValue() * Settings.N_COLS.getValue();
         field = new int[allCells];
         
         for (int i = 0; i < allCells; i++) {
-            field[i] = COVER_FOR_CELL;
+            field[i] = Settings.COVER_FOR_CELL.getValue();
         }
         statusbar.setText(Integer.toString(minesLeft));
        
         int i = 0;
-        while (i < N_MINES) {
+        while (i < Settings.N_MINES.getValue()) {
         	
             int position = (int) (allCells * random.nextDouble());
-            if ((position < allCells) && (field[position] != COVERED_MINE_CELL)) {
-                int current_col = position % N_COLS;
-                field[position] = COVERED_MINE_CELL;
+            if ((position < allCells) && (field[position] != Settings.COVERED_MINE_CELL.getValue())) {
+                int current_col = position % Settings.N_COLS.getValue();
+                field[position] = Settings.COVERED_MINE_CELL.getValue();
                 i++;
                 
                 // section 1
                 if (current_col > 0) {
-                    cell = position - 1 - N_COLS; // top left
+                    cell = position - 1 - Settings.N_COLS.getValue(); // top left
                     if (cell >= 0) {
-                        if (field[cell] != COVERED_MINE_CELL) {
+                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                             field[cell] += 1;
                         }
                     }
                     cell = position - 1; // left
                     if (cell >= 0) {
-                        if (field[cell] != COVERED_MINE_CELL) {
+                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                             field[cell] += 1;
                         }
                     }
 
-                    cell = position + N_COLS - 1; // bottom left
+                    cell = position + Settings.N_COLS.getValue() - 1; // bottom left
                     if (cell < allCells) {
-                        if (field[cell] != COVERED_MINE_CELL) {
+                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                             field[cell] += 1;
                         }
                     }
@@ -114,37 +128,37 @@ public class Board extends JPanel {
                 // end section 1
                 
                 // section 2
-                cell = position - N_COLS; // top
+                cell = position - Settings.N_COLS.getValue(); // top
                 if (cell >= 0) {
-                    if (field[cell] != COVERED_MINE_CELL) {
+                    if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                         field[cell] += 1;
                     }
                 }
 
-                cell = position + N_COLS; // bottom
+                cell = position + Settings.N_COLS.getValue(); // bottom
                 if (cell < allCells) {
-                    if (field[cell] != COVERED_MINE_CELL) {
+                    if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                         field[cell] += 1;
                     }
                 }
                 
                 // section 3
-                if (current_col < (N_COLS - 1)) {
-                    cell = position - N_COLS + 1;
+                if (current_col < (Settings.N_COLS.getValue() - 1)) {
+                    cell = position - Settings.N_COLS.getValue() + 1;
                     if (cell >= 0) {
-                        if (field[cell] != COVERED_MINE_CELL) {
+                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                             field[cell] += 1;
                         }
                     }
-                    cell = position + N_COLS + 1;
+                    cell = position + Settings.N_COLS.getValue() + 1;
                     if (cell < allCells) {
-                        if (field[cell] != COVERED_MINE_CELL) {
+                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                             field[cell] += 1;
                         }
                     }
                     cell = position + 1;
                     if (cell < allCells) {
-                        if (field[cell] != COVERED_MINE_CELL) {
+                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
                             field[cell] += 1;
                         }
                     }
@@ -156,96 +170,92 @@ public class Board extends JPanel {
 
     private void find_empty_cells(int j) {
 
-        int current_col = j % N_COLS;
+        int current_col = j % Settings.N_COLS.getValue();
         int cell;
-        
-        // section 1
+
         if (current_col > 0) {
-            cell = j - N_COLS - 1; // top left
+            cell = j - Settings.N_COLS.getValue() - 1;
             if (cell >= 0) {
-                if (field[cell] > MINE_CELL) {
-                    field[cell] -= COVER_FOR_CELL;
-                    if (field[cell] == EMPTY_CELL) {
+                if (field[cell] > Settings.MINE_CELL.getValue()) {
+                    field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                    if (field[cell] == Settings.EMPTY_CELL.getValue()) {
                         find_empty_cells(cell);
                     }
                 }
             }
 
-            cell = j - 1; // left
+            cell = j - 1;
             if (cell >= 0) {
-                if (field[cell] > MINE_CELL) {
-                    field[cell] -= COVER_FOR_CELL;
-                    if (field[cell] == EMPTY_CELL) {
+                if (field[cell] > Settings.MINE_CELL.getValue()) {
+                    field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                    if (field[cell] == Settings.EMPTY_CELL.getValue()) {
                         find_empty_cells(cell);
                     }
                 }
             }
 
-            cell = j + N_COLS - 1; // bottom left
+            cell = j + Settings.N_COLS.getValue()- 1;
             if (cell < allCells) {
-                if (field[cell] > MINE_CELL) {
-                    field[cell] -= COVER_FOR_CELL;
-                    if (field[cell] == EMPTY_CELL) {
+                if (field[cell] > Settings.MINE_CELL.getValue()) {
+                    field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                    if (field[cell] == Settings.EMPTY_CELL.getValue()) {
                         find_empty_cells(cell);
                     }
                 }
             }
         }
-        // end section 1
-        
-        // section 2
-        cell = j - N_COLS; // top
+
+        cell = j - Settings.N_COLS.getValue();
         if (cell >= 0) {
-            if (field[cell] > MINE_CELL) {
-                field[cell] -= COVER_FOR_CELL;
-                if (field[cell] == EMPTY_CELL) {
+            if (field[cell] > Settings.MINE_CELL.getValue()) {
+                field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                if (field[cell] == Settings.EMPTY_CELL.getValue()) {
                     find_empty_cells(cell);
                 }
             }
         }
 
-        cell = j + N_COLS; // bottom
+        cell = j + Settings.N_COLS.getValue();
         if (cell < allCells) {
-            if (field[cell] > MINE_CELL) {
-                field[cell] -= COVER_FOR_CELL;
-                if (field[cell] == EMPTY_CELL) {
+            if (field[cell] > Settings.MINE_CELL.getValue()) {
+                field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                if (field[cell] == Settings.EMPTY_CELL.getValue()) {
                     find_empty_cells(cell);
                 }
             }
         }
-        // end section 2
-        
-        // section 3
-        if (current_col < (N_COLS - 1)) {
-            cell = j - N_COLS + 1; // top right
+
+        if (current_col < (Settings.N_COLS.getValue() - 1)) {
+            cell = j - Settings.N_COLS.getValue() + 1;
             if (cell >= 0) {
-                if (field[cell] > MINE_CELL) {
-                    field[cell] -= COVER_FOR_CELL;
-                    if (field[cell] == EMPTY_CELL) {
+                if (field[cell] > Settings.MINE_CELL.getValue()) {
+                    field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                    if (field[cell] == Settings.EMPTY_CELL.getValue()) {
                         find_empty_cells(cell);
                     }
                 }
             }
-            cell = j + N_COLS + 1; // bottom right
-            if (cell < allCells) { 
-                if (field[cell] > MINE_CELL) {
-                    field[cell] -= COVER_FOR_CELL;
-                    if (field[cell] == EMPTY_CELL) {
-                        find_empty_cells(cell);
-                    }
-                }
-            }
-            cell = j + 1; // right
+
+            cell = j + Settings.N_COLS.getValue() + 1;
             if (cell < allCells) {
-                if (field[cell] > MINE_CELL) {
-                    field[cell] -= COVER_FOR_CELL;
-                    if (field[cell] == EMPTY_CELL) {
+                if (field[cell] > Settings.MINE_CELL.getValue()) {
+                    field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                    if (field[cell] == Settings.EMPTY_CELL.getValue()) {
+                        find_empty_cells(cell);
+                    }
+                }
+            }
+
+            cell = j + 1;
+            if (cell < allCells) {
+                if (field[cell] > Settings.MINE_CELL.getValue()) {
+                    field[cell] -= Settings.COVER_FOR_CELL.getValue();
+                    if (field[cell] ==  Settings.EMPTY_CELL.getValue()) {
                         find_empty_cells(cell);
                     }
                 }
             }
         }
-        // end section 3
 
     }
 
@@ -254,32 +264,32 @@ public class Board extends JPanel {
 
         int uncover = 0;
 
-        for (int i = 0; i < N_ROWS; i++) {
-            for (int j = 0; j < N_COLS; j++) {
-                int cell = field[(i * N_COLS) + j];
-                if (inGame && cell == MINE_CELL) {
+        for (int i = 0; i < Settings.N_ROWS.getValue(); i++) {
+            for (int j = 0; j < Settings.N_COLS.getValue(); j++) {
+                int cell = field[(i * Settings.N_COLS.getValue()) + j];
+                if (inGame && cell == Settings.MINE_CELL.getValue()) {
                     inGame = false;
                 }
                 if (!inGame) {
-                    if (cell == COVERED_MINE_CELL) {
-                        cell = DRAW_MINE;
-                    } else if (cell == MARKED_MINE_CELL) {
-                        cell = DRAW_MARK;
-                    } else if (cell > COVERED_MINE_CELL) {
-                        cell = DRAW_WRONG_MARK;
-                    } else if (cell > MINE_CELL) {
-                        cell = DRAW_COVER;
+                    if (cell == Settings.COVERED_MINE_CELL.getValue()) {
+                        cell = Settings.DRAW_MINE.getValue();
+                    } else if (cell == Settings.MARKED_MINE_CELL.getValue()) {
+                        cell = Settings.DRAW_MARK.getValue();
+                    } else if (cell > Settings.COVERED_MINE_CELL.getValue()) {
+                        cell = Settings.DRAW_WRONG_MARK.getValue();
+                    } else if (cell > Settings.MINE_CELL.getValue()) {
+                        cell = Settings.DRAW_COVER.getValue();
                     }
                 } else {
-                    if (cell > COVERED_MINE_CELL) {
-                        cell = DRAW_MARK;
-                    } else if (cell > MINE_CELL) {
-                        cell = DRAW_COVER;
+                    if (cell > Settings.COVERED_MINE_CELL.getValue()) {
+                        cell = Settings.DRAW_MARK.getValue();
+                    } else if (cell > Settings.MINE_CELL.getValue()) {
+                        cell = Settings.DRAW_COVER.getValue();
                         uncover++;
                     }
                 }
-                g.drawImage(img[cell], (j * CELL_SIZE),
-                        (i * CELL_SIZE), this);
+                g.drawImage(img[cell], (j * Settings.CELL_SIZE.getValue()),
+                        (i * Settings.CELL_SIZE.getValue()), this);
             }
         }
         
@@ -302,22 +312,22 @@ public class Board extends JPanel {
             int x = e.getX();
             int y = e.getY();
 
-            int cCol = x / CELL_SIZE;
-            int cRow = y / CELL_SIZE;
+            int cCol = x / Settings.CELL_SIZE.getValue();
+            int cRow = y / Settings.CELL_SIZE.getValue();
 
             boolean doRepaint = false;
             if (!inGame) {
                 newGame();
                 repaint();
             }
-            if ((x < N_COLS * CELL_SIZE) && (y < N_ROWS * CELL_SIZE)) {
+            if ((x < Settings.N_COLS.getValue() * Settings.CELL_SIZE.getValue()) && (y < Settings.N_ROWS.getValue() * Settings.CELL_SIZE.getValue())) {
                 if (e.getButton() == MouseEvent.BUTTON3) { // right mouse button clicked
-                    if (field[(cRow * N_COLS) + cCol] > MINE_CELL) {
+                    if (field[(cRow * Settings.N_COLS.getValue()) + cCol] > Settings.MINE_CELL.getValue()) {
                         doRepaint = true;
 
-                        if (field[(cRow * N_COLS) + cCol] <= COVERED_MINE_CELL) {
+                        if (field[(cRow * Settings.N_COLS.getValue()) + cCol] <= Settings.COVERED_MINE_CELL.getValue()) {
                             if (minesLeft > 0) {
-                                field[(cRow * N_COLS) + cCol] += MARK_FOR_CELL;
+                                field[(cRow * Settings.N_COLS.getValue()) + cCol] += Settings.MARK_FOR_CELL.getValue();
                                 minesLeft--;
                                 String msg = Integer.toString(minesLeft);
                                 statusbar.setText(msg);
@@ -325,25 +335,25 @@ public class Board extends JPanel {
                                 statusbar.setText("No marks left");
                             }
                         } else {
-                            field[(cRow * N_COLS) + cCol] -= MARK_FOR_CELL;
+                            field[(cRow * Settings.N_COLS.getValue()) + cCol] -= Settings.MARK_FOR_CELL.getValue();
                             minesLeft++;
                             String msg = Integer.toString(minesLeft);
                             statusbar.setText(msg);
                         }
                     }
                 } else { // left mouse button clicked
-                    if (field[(cRow * N_COLS) + cCol] > COVERED_MINE_CELL) {
+                    if (field[(cRow * Settings.N_COLS.getValue()) + cCol] > Settings.COVERED_MINE_CELL.getValue()) {
                         return;
                     }
-                    if ((field[(cRow * N_COLS) + cCol] > MINE_CELL) && (field[(cRow * N_COLS) + cCol] < MARKED_MINE_CELL)) {
-                        field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
+                    if ((field[(cRow * Settings.N_COLS.getValue()) + cCol] > Settings.MINE_CELL.getValue()) && (field[(cRow * Settings.N_COLS.getValue()) + cCol] < Settings.MARKED_MINE_CELL.getValue())) {
+                        field[(cRow * Settings.N_COLS.getValue()) + cCol] -= Settings.COVER_FOR_CELL.getValue();
                         doRepaint = true;
 
-                        if (field[(cRow * N_COLS) + cCol] == MINE_CELL) {
+                        if (field[(cRow * Settings.N_COLS.getValue()) + cCol] == Settings.MINE_CELL.getValue()) {
                             inGame = false;
                         }
-                        if (field[(cRow * N_COLS) + cCol] == EMPTY_CELL) {
-                            find_empty_cells((cRow * N_COLS) + cCol);
+                        if (field[(cRow * Settings.N_COLS.getValue()) + cCol] == Settings.EMPTY_CELL.getValue()) {
+                            find_empty_cells((cRow * Settings.N_COLS.getValue()) + cCol);
                         }
                     }
                 }
