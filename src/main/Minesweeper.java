@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+// Author: Jefel Villacorta
 
 public class Minesweeper extends JFrame {
 
