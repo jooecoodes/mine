@@ -8,8 +8,11 @@ import java.util.Random;
 import javax.swing.Timer;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingUtilities;
@@ -67,18 +70,30 @@ public class Board extends JPanel {
     public Board(JLabel statusbar) {
         this.statusbar = statusbar;
         initBoard();
+        
     }
 
     private void initBoard() {
 
-        setPreferredSize(new Dimension(Settings.BOARD_WIDTH.getValue(), Settings.BOARD_HEIGHT.getValue()));
+        setPreferredSize(new Dimension(Settings.BOARD_WIDTH.getValue(), Settings.BOARD_HEIGHT.getValue() + 8));
+        
+        
         img = new Image[Settings.NUM_IMAGES.getValue()];
 
         for (int i = 0; i < Settings.NUM_IMAGES.getValue(); i++) {
             var path = "src/resources/" + i + ".png";
             img[i] = (new ImageIcon(path)).getImage();
         }
+        
 
+        JButton helpButton = new JButton("?");
+        helpButton.setBounds(10, 565, 50, 20);
+        helpButton.addActionListener(e -> showHelpFrame());
+        this.setLayout(null);  // Enable absolute positioning
+        this.add(helpButton);
+        
+        
+        
         addMouseListener(new MinesAdapter());
         newGame();
     }
@@ -202,6 +217,34 @@ public class Board extends JPanel {
             }
         }
 
+    }
+    private void showHelpFrame() {
+    	  JFrame helpFrame = new JFrame("Game Instructions");
+          helpFrame.setSize(300, 220);
+          helpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+          helpFrame.setLocationRelativeTo(null);
+          
+          JTextArea instructions = new JTextArea(
+              "Minesweeper Game Instructions:\n\n" +
+              "1. Left-click to reveal a cell.\n" +
+              "2. Right-click to place a flag on a suspected mine.\n" +
+              "3. Avoid uncovering cells with mines.\n" +
+              "4. The number in a cell indicates how many mines are adjacent to it.\n" +
+              "5. Use logic to deduce safe cells.\n" +
+              "6. Clear all safe cells to win. \n" +
+              "7. Enjoy the game!\n" +
+              "Good luck!"
+          );
+          instructions.setEditable(false);
+          instructions.setLineWrap(true);
+          instructions.setWrapStyleWord(true);
+
+          JPanel panel = new JPanel();
+          panel.setLayout(new java.awt.BorderLayout());
+          panel.add(instructions, java.awt.BorderLayout.CENTER);
+
+          helpFrame.add(panel);
+          helpFrame.setVisible(true);
     }
     
     private void startTimer() {
