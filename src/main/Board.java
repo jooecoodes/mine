@@ -5,7 +5,7 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Random;
-import java.util.Timer;
+import javax.swing.Timer;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -52,11 +52,14 @@ enum Settings{
 
 public class Board extends JPanel {
  
+	//	globals
     private int[] field;
     private boolean inGame;
     private boolean showLost;
     private int minesLeft;
     private Image[] img;
+    private Timer timer;
+    private int timeElapsed;
 
     private int allCells;
     private final JLabel statusbar;
@@ -79,9 +82,9 @@ public class Board extends JPanel {
         addMouseListener(new MinesAdapter());
         newGame();
     }
-
+    
+    
     private void newGame() {
-    	
         int cell;
         var random = new Random();
         inGame = true;
@@ -93,6 +96,8 @@ public class Board extends JPanel {
             field[i] = Settings.COVER_FOR_CELL.getValue();
         }
         statusbar.setText(Integer.toString(minesLeft));
+        timeElapsed = 0;  // Reset time for new game
+        startTimer();  // Start the timer
        
         int i = 0;
         while (i < Settings.N_MINES.getValue()) {
@@ -103,67 +108,7 @@ public class Board extends JPanel {
                 field[position] = Settings.COVERED_MINE_CELL.getValue();
                 i++;
                 
-                // section 1
-                if (current_col > 0) {
-                    cell = position - 1 - Settings.N_COLS.getValue(); // top left
-                    if (cell >= 0) {
-                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                            field[cell] += 1;
-                        }
-                    }
-                    cell = position - 1; // left
-                    if (cell >= 0) {
-                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                            field[cell] += 1;
-                        }
-                    }
-
-                    cell = position + Settings.N_COLS.getValue() - 1; // bottom left
-                    if (cell < allCells) {
-                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                            field[cell] += 1;
-                        }
-                    }
-                }
-                // end section 1
-                
-                // section 2
-                cell = position - Settings.N_COLS.getValue(); // top
-                if (cell >= 0) {
-                    if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                        field[cell] += 1;
-                    }
-                }
-
-                cell = position + Settings.N_COLS.getValue(); // bottom
-                if (cell < allCells) {
-                    if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                        field[cell] += 1;
-                    }
-                }
-                
-                // section 3
-                if (current_col < (Settings.N_COLS.getValue() - 1)) {
-                    cell = position - Settings.N_COLS.getValue() + 1;
-                    if (cell >= 0) {
-                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                            field[cell] += 1;
-                        }
-                    }
-                    cell = position + Settings.N_COLS.getValue() + 1;
-                    if (cell < allCells) {
-                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                            field[cell] += 1;
-                        }
-                    }
-                    cell = position + 1;
-                    if (cell < allCells) {
-                        if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
-                            field[cell] += 1;
-                        }
-                    }
-                }
-                // end section 3
+                updateSurroundingCells(position, current_col);
             }
         }
     }
@@ -258,7 +203,80 @@ public class Board extends JPanel {
         }
 
     }
+    
+    private void startTimer() {
+        timer = new Timer(1000, e -> {
+            timeElapsed++;
+            statusbar.setText("Mines left: " + minesLeft + " | Time: " + timeElapsed + "s");
+        });
+        timer.start();
+    }
+    private void stopTimer() {
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+        }
+    }
+    private void updateSurroundingCells(int position, int current_col) {
+        int cell;
+        // section 1
+        if (current_col > 0) {
+            cell = position - 1 - Settings.N_COLS.getValue(); // top left
+            if (cell >= 0) {
+                if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                    field[cell] += 1;
+                }
+            }
+            cell = position - 1; // left
+            if (cell >= 0) {
+                if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                    field[cell] += 1;
+                }
+            }
 
+            cell = position + Settings.N_COLS.getValue() - 1; // bottom left
+            if (cell < allCells) {
+                if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                    field[cell] += 1;
+                }
+            }
+        }
+        // section 2
+        cell = position - Settings.N_COLS.getValue(); // top
+        if (cell >= 0) {
+            if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                field[cell] += 1;
+            }
+        }
+
+        cell = position + Settings.N_COLS.getValue(); // bottom
+        if (cell < allCells) {
+            if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                field[cell] += 1;
+            }
+        }
+
+        // section 3
+        if (current_col < (Settings.N_COLS.getValue() - 1)) {
+            cell = position - Settings.N_COLS.getValue() + 1;
+            if (cell >= 0) {
+                if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                    field[cell] += 1;
+                }
+            }
+            cell = position + Settings.N_COLS.getValue() + 1;
+            if (cell < allCells) {
+                if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                    field[cell] += 1;
+                }
+            }
+            cell = position + 1;
+            if (cell < allCells) {
+                if (field[cell] != Settings.COVERED_MINE_CELL.getValue()) {
+                    field[cell] += 1;
+                }
+            }
+        }
+    }
     @Override
     public void paintComponent(Graphics g) {
 
@@ -296,11 +314,12 @@ public class Board extends JPanel {
         
         checkWin(uncover);
     }
-    
+
     private void checkWin(int uncover) {
     	 // Victory condition
         if (uncover == 0 && inGame) {
             inGame = false;
+            stopTimer(); // Stop the timer
             SwingUtilities.invokeLater(() -> {
                 int response = JOptionPane.showOptionDialog(
                         null, 
@@ -322,6 +341,7 @@ public class Board extends JPanel {
             });
 
         } else if (!inGame) {
+        	stopTimer(); // Stop the timer
         	SwingUtilities.invokeLater(() -> {
         	    int response = JOptionPane.showOptionDialog(
         	            null, 
