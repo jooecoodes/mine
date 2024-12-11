@@ -334,13 +334,10 @@ public class Board extends JPanel {
         	            "Try Again" 
         	    );
 
-        	    // Check the user's response
         	    if (response == JOptionPane.YES_OPTION) {
-        	        // Code to restart the game
         	        newGame();
         	        repaint();
         	    } else {
-        	        // Code to exit the game
         	        System.exit(0);
         	    }
         	});
