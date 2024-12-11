@@ -5,9 +5,15 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Random;
+import java.util.Timer;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
 // COVERED _MINE_CELL =  MINE_CELL + COVER_FOR_CELL
 // MARKED_MINE_CELL = COVERED_MINE_CELL + MARK_FOR_CELL
@@ -16,7 +22,7 @@ import javax.swing.JPanel;
 
 enum Settings{
 	NUM_IMAGES(13),
-	CELL_SIZE(15),
+	CELL_SIZE(35),
 	COVER_FOR_CELL(10),
 	MARK_FOR_CELL(10),
 	EMPTY_CELL(0),
@@ -30,28 +36,25 @@ enum Settings{
 	N_MINES(40),
 	N_ROWS(16),
 	N_COLS(16),
-	BOARD_WIDTH(241),
-	BOARD_HEIGHT(241);
+	BOARD_WIDTH(576),
+	BOARD_HEIGHT(576);
 	
-
     private int value;
-	
-    // Constructor to set the value
+ 
     Settings(int value) {
         this.value = value;
     }
 
-    // Getter to retrieve the value
     public int getValue() {
         return this.value;
     }
 }
 
 public class Board extends JPanel {
-    
  
     private int[] field;
     private boolean inGame;
+    private boolean showLost;
     private int minesLeft;
     private Image[] img;
 
@@ -59,7 +62,6 @@ public class Board extends JPanel {
     private final JLabel statusbar;
 
     public Board(JLabel statusbar) {
-    	System.out.println(Settings.NUM_IMAGES.getValue());
         this.statusbar = statusbar;
         initBoard();
     }
@@ -67,11 +69,9 @@ public class Board extends JPanel {
     private void initBoard() {
 
         setPreferredSize(new Dimension(Settings.BOARD_WIDTH.getValue(), Settings.BOARD_HEIGHT.getValue()));
-
         img = new Image[Settings.NUM_IMAGES.getValue()];
 
         for (int i = 0; i < Settings.NUM_IMAGES.getValue(); i++) {
-
             var path = "src/resources/" + i + ".png";
             img[i] = (new ImageIcon(path)).getImage();
         }
@@ -268,6 +268,7 @@ public class Board extends JPanel {
             for (int j = 0; j < Settings.N_COLS.getValue(); j++) {
                 int cell = field[(i * Settings.N_COLS.getValue()) + j];
                 if (inGame && cell == Settings.MINE_CELL.getValue()) {
+                	showLost = true;
                     inGame = false;
                 }
                 if (!inGame) {
@@ -297,14 +298,56 @@ public class Board extends JPanel {
     }
     
     private void checkWin(int uncover) {
-    	// victory condition
+    	 // Victory condition
         if (uncover == 0 && inGame) {
             inGame = false;
-            statusbar.setText("Game won");
+            SwingUtilities.invokeLater(() -> {
+                int response = JOptionPane.showOptionDialog(
+                        null, 
+                        "Game Won! Would you like to try again?", 
+                        "Game Status", 
+                        JOptionPane.YES_NO_OPTION, 
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null, 
+                        new Object[]{"Try Again", "Exit"}, 
+                        "Try Again" 
+                );
+
+                if (response == JOptionPane.YES_OPTION) {
+                    newGame();
+                    repaint();
+                } else {
+                    System.exit(0);
+                }
+            });
+
         } else if (!inGame) {
-            statusbar.setText("Game lost");
-        }
+        	SwingUtilities.invokeLater(() -> {
+        	    int response = JOptionPane.showOptionDialog(
+        	            null, 
+        	            "Game Over! Would you like to try again?", 
+        	            "Game Status", 
+        	            JOptionPane.YES_NO_OPTION, 
+        	            JOptionPane.INFORMATION_MESSAGE, 
+        	            null, 
+        	            new Object[]{"Try Again", "Exit"}, 
+        	            "Try Again" 
+        	    );
+
+        	    // Check the user's response
+        	    if (response == JOptionPane.YES_OPTION) {
+        	        // Code to restart the game
+        	        newGame();
+        	        repaint();
+        	    } else {
+        	        // Code to exit the game
+        	        System.exit(0);
+        	    }
+        	});
+       
+        } 
     }
+ 
     
     private class MinesAdapter extends MouseAdapter {
         @Override
@@ -316,10 +359,7 @@ public class Board extends JPanel {
             int cRow = y / Settings.CELL_SIZE.getValue();
 
             boolean doRepaint = false;
-            if (!inGame) {
-                newGame();
-                repaint();
-            }
+
             if ((x < Settings.N_COLS.getValue() * Settings.CELL_SIZE.getValue()) && (y < Settings.N_ROWS.getValue() * Settings.CELL_SIZE.getValue())) {
                 if (e.getButton() == MouseEvent.BUTTON3) { // right mouse button clicked
                     if (field[(cRow * Settings.N_COLS.getValue()) + cCol] > Settings.MINE_CELL.getValue()) {

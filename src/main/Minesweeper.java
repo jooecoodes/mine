@@ -6,22 +6,21 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-// Author: Jefel Villacorta
 
 public class Minesweeper extends JFrame {
+
 
     private JLabel statusbar;
 
     public Minesweeper() {
-
         initUI();
     }
 
     private void initUI() {
-
         statusbar = new JLabel("Hello");
         add(statusbar, BorderLayout.SOUTH);
 
+        // Initialize the board
         add(new Board(statusbar));
 
         setResizable(false);
@@ -33,9 +32,7 @@ public class Minesweeper extends JFrame {
     }
 
     public static void main(String[] args) {
-
         EventQueue.invokeLater(() -> {
-
             var ex = new Minesweeper();
             ex.setVisible(true);
         });
