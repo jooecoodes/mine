@@ -95,7 +95,7 @@ public class Board extends JPanel {
         for (int i = 0; i < allCells; i++) {
             field[i] = Settings.COVER_FOR_CELL.getValue();
         }
-        statusbar.setText(Integer.toString(minesLeft));
+        statusbar.setText("Flags left: " + minesLeft);
         timeElapsed = 0;  // Reset time for new game
         startTimer();  // Start the timer
        
@@ -207,7 +207,7 @@ public class Board extends JPanel {
     private void startTimer() {
         timer = new Timer(1000, e -> {
             timeElapsed++;
-            statusbar.setText("Mines left: " + minesLeft + " | Time: " + timeElapsed + "s");
+            statusbar.setText("Flags left: " + minesLeft + " | Time: " + timeElapsed + "s");
         });
         timer.start();
     }
@@ -316,14 +316,14 @@ public class Board extends JPanel {
     }
 
     private void checkWin(int uncover) {
-    	 // Victory condition
+    	 // victory condition
         if (uncover == 0 && inGame) {
             inGame = false;
-            stopTimer(); // Stop the timer
+            stopTimer(); 
             SwingUtilities.invokeLater(() -> {
                 int response = JOptionPane.showOptionDialog(
                         null, 
-                        "Game Won! Would you like to try again?", 
+                        "Game Won! Time Elapsed: " + timeElapsed + " sec. Would you like to try again?", 
                         "Game Status", 
                         JOptionPane.YES_NO_OPTION, 
                         JOptionPane.INFORMATION_MESSAGE,
@@ -341,11 +341,11 @@ public class Board extends JPanel {
             });
 
         } else if (!inGame) {
-        	stopTimer(); // Stop the timer
+        	stopTimer(); 
         	SwingUtilities.invokeLater(() -> {
         	    int response = JOptionPane.showOptionDialog(
         	            null, 
-        	            "Game Over! Would you like to try again?", 
+        	            "Game Over! Time elapsed: " + timeElapsed + " sec. Would you like to try again?", 
         	            "Game Status", 
         	            JOptionPane.YES_NO_OPTION, 
         	            JOptionPane.INFORMATION_MESSAGE, 
@@ -386,16 +386,14 @@ public class Board extends JPanel {
                             if (minesLeft > 0) {
                                 field[(cRow * Settings.N_COLS.getValue()) + cCol] += Settings.MARK_FOR_CELL.getValue();
                                 minesLeft--;
-                                String msg = Integer.toString(minesLeft);
-                                statusbar.setText(msg);
+                                statusbar.setText("Flags left: " + minesLeft);
                             } else {
-                                statusbar.setText("No marks left");
+                                statusbar.setText("No flags left");
                             }
                         } else {
                             field[(cRow * Settings.N_COLS.getValue()) + cCol] -= Settings.MARK_FOR_CELL.getValue();
                             minesLeft++;
-                            String msg = Integer.toString(minesLeft);
-                            statusbar.setText(msg);
+                            statusbar.setText("Flags left: " + minesLeft);
                         }
                     }
                 } else { // left mouse button clicked
