@@ -28,7 +28,7 @@ public class Minesweeper extends JFrame {
         statusbar = new JLabel("Hello");
         add(statusbar, BorderLayout.SOUTH);
 
-        // Initialize the board
+        // initialize the board
         add(new Board(statusbar));
 
         setResizable(false);
@@ -61,7 +61,7 @@ class MainMenu extends JFrame {
 	    }
 
 	    private void initUI() {
-	    	 // Create and set up the image label
+	    	 // set up img label
 	        ImageIcon icon = new ImageIcon("src/resources/9.png");
 	        JLabel imageLabel = new JLabel(icon);
 
@@ -90,12 +90,12 @@ class MainMenu extends JFrame {
 	        getContentPane().setLayout(new BorderLayout());
 	        getContentPane().add(panel, BorderLayout.CENTER);
 	        
-	        // Set the window icon
+	        // set window icon
 	        setIconImage(new ImageIcon("src/resources/9.png").getImage()); 
 
 	        setTitle("Minesweeper - Main Menu");
 	        setSize(400, 400);
-	        setLocationRelativeTo(null);  // Center the window on the screen
+	        setLocationRelativeTo(null); 
 	        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    }
 
@@ -109,10 +109,9 @@ class MainMenu extends JFrame {
 	    }
 
 	    private void startGame() {
-	        // Close the main menu
+	        // close menu
 	        this.setVisible(false);
 	        
-	        // Open the Minesweeper game window
 	        var game = new Minesweeper();
 	        game.setVisible(true);
 	        game.setIconImage(new ImageIcon("src/resources/9.png").getImage()); // Path to your icon image file
